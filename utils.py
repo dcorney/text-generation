@@ -1,0 +1,6 @@
+
+ner_per = "PERSON"
+ner_org = "ORGANIZATION"
+ner_loc = "LOCATION"
+START_TOKEN = "<START_TOKEN>"
+END_TOKEN = "<END_TOKEN>"
