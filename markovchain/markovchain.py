@@ -18,22 +18,35 @@ class MarkovChain(object):
         self._symbols = []
         self._source_field = "SOURCE_LIST"
 
-    def add_text(self, text, weight=1):
-        tokens = text.split()
+    def delete_all_in_redis_careful(self):
+        self._store.delete_all_in_redis_be_careful()
+
+    def get_order(self):
+        return self._order
+
+    def add_sentence(self, sentence, weight=1):
+        """Takes a string as a sentence, splits on white space, adds start & end token, then udpates model"""
+        tokens = sentence.split()
+        tokens.insert(0, utils.START_TOKEN)
+        tokens.append(utils.END_TOKEN)
+        self.train_words(tokens, weight)
+
+    def train_words(self, tokens, weight=1):
+        """Take list of tokens and update model."""
         for idx in range(len(tokens)):
             start = max(0, idx - self._order)
             end = idx
             for sub_idx in range(start, end):
                 node_from = '|'.join(tokens[sub_idx:end]) + ":fwd"
                 node_to = str(tokens[idx])
-                logger.info("Adding link from '%s' fwd-to '%s':  ", node_from, node_to)
+                #logger.info("Adding link from '%s' fwd-to '%s':  ", node_from, node_to)
                 self._store.update_weight(node_from, node_to, weight)
             start = idx + 1
             end = min(idx + self._order + 1, len(tokens))
             for sub_idx in range(start + 1, end + 1):
                 node_from = '|'.join(tokens[start:sub_idx]) + ":back"
                 node_to = str(tokens[idx])
-                logger.info("Adding link from '%s' back-to '%s':  ", node_from, node_to)
+                #logger.info("Adding link from '%s' back-to '%s':  ", node_from, node_to)
                 self._store.update_weight(node_from, node_to, weight)
 
     def append_ner(self, entities):
@@ -84,18 +97,7 @@ class MarkovChain(object):
     def random_entry(self):
         "Make sure random entry is not a special token (e.g. sentence-start)"
         return self._store.random_entry()
-        # while True:
-        #     s = self._redis.randomkey().decode("utf-8")
-        #     if not(s.startswith(utils.START_TOKEN) or s.startswith(utils.END_TOKEN)):
-        #         break
-        # return s[0:s.rfind(":")].split("|")
 
     def random_entity(self, ner_type):
         """Returns random entity of specified type"""
-        # idx = random.randint(0, self._redis.llen(ner_type) - 1)
-        
-        # return self._redis.lindex(ner_type, idx).decode('UTF-8')
-
-# if __name__ == '__main__':
-#     mc = MarkovChain()
-#     mc.add_text("this is a set of words")
+        return self._store.random_entity(ner_type)

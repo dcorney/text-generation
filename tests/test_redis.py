@@ -7,9 +7,9 @@ test_to_key = "test_to_fake_key"
 
 
 def test_basic_storage():
-    prior = int(store.get_weights(test_from_key).get(test_to_key.encode('UTF-8')))
+    prior = int(store.get_weights(test_from_key).get(test_to_key.encode('UTF-8'),0))
     update = store.update_weight(test_from_key, test_to_key, 1)
-    final = int(store.get_weights(test_from_key).get(test_to_key.encode('UTF-8')))
+    final = int(store.get_weights(test_from_key).get(test_to_key.encode('UTF-8'),0))
     assert final == update
     assert final == (prior + 1)
 

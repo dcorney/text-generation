@@ -1,5 +1,9 @@
 import redis
 import utils
+import random
+import logging
+
+logger = logging.getLogger(__name__)
 
 "Interface to persistent datastore."
 
@@ -22,13 +26,13 @@ class redis_store(object):
         return new_val
 
     def append_ner(self, entities):
-        for ner_type in [utils._ner_per, utils._ner_org, utils._ner_loc]:
+        for ner_type in [utils.ner_per, utils.ner_org, utils.ner_loc]:
             for entity in entities[ner_type]:
                 self._redis.rpush(ner_type, entity)
 
     def unappend_ner(self, entities):
         "Remove one copy of each entity in the list"
-        for ner_type in [self._ner_per, self._ner_org, self._ner_loc]:
+        for ner_type in [utils.ner_per, utils.ner_org, utils.ner_loc]:
             for entity in entities[ner_type]:
                 self._redis.lrem(ner_type, 1, entity)
 
@@ -45,7 +49,16 @@ class redis_store(object):
             if not(s.startswith(utils.START_TOKEN) or s.startswith(utils.END_TOKEN)):
                 break
         return s[0:s.rfind(":")].split("|")
-    
+
+    def random_entity(self, ner_type):
+        """Returns random entity of specified type"""
+        type_count = self._redis.llen(ner_type)
+        if type_count > 0:
+            idx = random.randint(0, type_count - 1)
+            return(self._redis.lindex(ner_type, idx).decode('UTF-8'))
+        else:
+            logger.info("No entity in Redis store for type {}".format(ner_type))
+            return ""
 
     # TODO: Add check_source() which returns true iif source_name is in list already
     # Use it to stop loading same doc twice. Also probably a source_report fn.
