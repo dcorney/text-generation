@@ -1,6 +1,6 @@
-from context import markovchain
+from context import core as core
 
-mc = markovchain.markovchain.MarkovChain()
+mc = core.markovchain.MarkovChain()
 
 
 def test_random_bits():

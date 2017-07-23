@@ -35,12 +35,20 @@ def wiki_text(query):
                 links = [x for x in err.options if x.find("disambiguation") < 0]
                 random_page = links[random.randint(0, len(links) - 1)]
                 text = wikipedia.summary(random_page)
-    except:
+    except Exception:
         text = wiki_random()
     return(text)
 
 
 def wiki_random():
-    random_page = wikipedia.random(1)
-    text = wikipedia.page(random_page).content  # don't assume summary exists!
+    text = ""
+    while text == "":
+        try:
+            random_page = wikipedia.random(1)
+            text = wikipedia.page(random_page).content  # don't assume summary exists!
+        except Exception as e:
+            print(e)
+            logger.info("Random wiki page '{}'' not found! Exception {}".format(random_page, e))
+            text = ""
+
     return(text)

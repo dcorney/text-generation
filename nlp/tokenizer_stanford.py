@@ -77,10 +77,13 @@ def tokenize_sentence(s):
 def find_sentences(text):
     ss = sent_tokenize(text)
     for idx in range(1, len(ss)):
-        if ss[idx - 1][-1] == '"' and ss[idx][0].islower():
-            logger.info("Merging sentence tokens: {} + {} ".format(ss[idx - 1], ss[idx]))
-            ss[idx - 1] = ss[idx - 1] + " " + ss[idx]
-            ss[idx] = ""
+        try:
+            if ss[idx - 1][-1] == '"' and ss[idx][0].islower():
+                logger.info("Merging sentence tokens: {} + {} ".format(ss[idx - 1], ss[idx]))
+                ss[idx - 1] = ss[idx - 1] + " " + ss[idx]
+                ss[idx] = ""
+        except IndexError:
+            pass
     return list(filter(None, ss))
 
 
@@ -94,7 +97,7 @@ def tokenize(text):
     logger.info("Found {:3d} sentences  ".format(len(sents)))
     flattened_tokens = []
     merged_entities = {"ORGANIZATION": [], "PERSON": [], "LOCATION": []}
-    for s in sents:
+    for idx, s in enumerate(sents):
         tokens_entities = tokenize_sentence(s)
         tokens = tokens_entities['tokens']
         entities = tokens_entities['entities']
@@ -102,6 +105,8 @@ def tokenize(text):
         merged_entities['ORGANIZATION'] += entities.get('ORGANIZATION', [])
         merged_entities['PERSON'] += entities.get('PERSON', [])
         merged_entities['LOCATION'] += entities.get('LOCATION', [])
+        if idx % 100 == 0:
+            logger.info("Progress: {}/{}".format(idx, len(sents)))
     return {'tokens': flattened_tokens, 'entities': merged_entities}
 
 

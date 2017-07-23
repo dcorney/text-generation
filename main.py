@@ -1,10 +1,10 @@
-import markovchain.markovchain as mchain
-import markovchain.sentence as sentence
-import utils
+import core.markovchain as mc
+import core.sentence as sentence
 import nlp.tokenizer_stanford as tokenize
-import gutenberg.basic_strip as bs
+#from gutenberg import basic_strip as bs
+import database.text_importer as gut
 import database.files as store
-import markovchain.paragraphs as paragraphs
+import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import time
 import cProfile
@@ -12,37 +12,41 @@ import pstats
 import logging
 logger = logging.getLogger(__name__)
 
-FORMAT='%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
-logging.basicConfig(filename='logs/textgen.log', level=logging.DEBUG, format=FORMAT,datefmt='%m/%d/%Y %H:%M:%S')
+FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
+logging.basicConfig(filename='logs/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
 logger.info("\n========================================== New run ==========================================")
 
-def load_text():
-    mc = mchain.MarkovChain()
-    mc.delete_all_in_redis_careful()
 
-    #doc = bs.get_clean_text(103)
-    #cache = store.files(store.Storage_type.local_dev)
-    #cache.write_text(doc['text'],"103.txt")
-    with open("database/resources/texts/103.txt") as file_in:
-        text=file_in.read()
+# def load_text():
+#     mcW = mc.MarkovChain()
+#     mcW.delete_all_in_redis_careful()
 
-    
-    tokens = tokenize.tokenize(text[2000:20000])
-    print(tokens['tokens'][0:50])
-    print(tokens['entities'])
-    mc.train_words(tokens['tokens'])
-    mc.append_ner(tokens['entities'])
+#     doc = bs.get_clean_text(103)
+#     cache = store.files(store.Storage_type.local_dev)
+#     cache.write_text(doc['text'],"103.txt")
+#     with open("database/resources/texts/103.txt") as file_in:
+#         text = file_in.read()
 
-    generator=sentence.Sentence(mc)
-    s=generator.generate_sentence(["the","man"])
-    print(" ".join(s))
+#     tokens = tokenize.tokenize(text[2000:20000])
+#     print(tokens['tokens'][0:50])
+#     print(tokens['entities'])
+#     mc.train_words(tokens['tokens'])
+#     mc.append_ner(tokens['entities'])
+
+#     generator = sentence.SentenceMaker(mc)
+#     s = generator.generate_sentence_tokens(["the", "man"])
+#     print(" ".join(s))
 
 
 def dev():
-    mc = mchain.MarkovChain()
-    ps = paragraphs.phrases_from_wiki("dog",3,2)
-    ss = paragraphs.seq_to_para(ps,mc)
-    print(ss)
+    mcW = mc.MarkovChain()
+    phrase = "dog cat cat dog dog dog"
+    seeds = phrase.split(" ")
+    dm = dialogue.dialogue_maker(["Alice", "Bob", "Carol", "Dan"], ["she", "he", "she", "he"], mcW, seeds)
+    print(dm.make_dialogue())
+    # print(wiki.wiki_random()[0:70])
+    # importer = gut.TextImporter(mcW)
+    # importer.get_text_from_gut(105)
 
 if __name__ == "__main__":
     dev()
