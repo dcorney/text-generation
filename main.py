@@ -6,11 +6,14 @@ import database.text_importer as gut
 import database.files as store
 import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
+import knowledge.word_vectors as w2v
+import knowledge.names as names
 import time
 import cProfile
 import pstats
 import logging
 logger = logging.getLogger(__name__)
+
 
 FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
 logging.basicConfig(filename='logs/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
@@ -40,13 +43,22 @@ logger.info("\n========================================== New run ==============
 
 def dev():
     mcW = mc.MarkovChain()
-    phrase = "dog cat cat dog dog dog"
-    seeds = phrase.split(" ")
-    dm = dialogue.dialogue_maker(["Alice", "Bob", "Carol", "Dan"], ["she", "he", "she", "he"], mcW, seeds)
-    print(dm.make_dialogue())
+#     phrase = "dog cat cat dog dog dog"
+#     seeds = phrase.split(" ")
+    seeds = w2v.make_sequence("swim", 20)
+    print(seeds)
+    nm = names.NameMaker()
+    speakers = [nm.random_person() for i in range(1, 4)]
+    dm = dialogue.dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW, seeds)
+    dlg = dm.make_dialogue()
+    # sm = sentence.SentenceMaker(mcW)
+    for s in dlg:
+        print("  " + sentence.SentenceMaker.to_string(s))
+
     # print(wiki.wiki_random()[0:70])
     # importer = gut.TextImporter(mcW)
     # importer.get_text_from_gut(105)
+
 
 if __name__ == "__main__":
     dev()
