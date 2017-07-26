@@ -29,4 +29,4 @@ def test_make_dialogue():
     print(dlg)
     assert isinstance(dlg, str)
 
-    
+
