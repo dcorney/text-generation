@@ -28,3 +28,4 @@ def test_make_dialogue():
     dlg = dm.make_dialogue()
     print(dlg)
     assert isinstance(dlg, str)
+    
