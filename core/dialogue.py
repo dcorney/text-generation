@@ -76,10 +76,10 @@ class dialogue_maker(object):
             sent_toks = ss.generate_sentence_tokens([self.seeds[i]], self.target_len[speaker_id[i]])
             sent_toks = ss.polish_sentence(sent_toks)
             bits.append({'speaker_name': self.speakers[speaker_id[i]]["name"],
-                 'speech_act': speech_acts_seq[speaker_id[i]],
-                 'seq_id': speaker_id[i],
-                 'speech': sent_toks,
-                 'paragraph': True})
+                         'speech_act': speech_acts_seq[speaker_id[i]],
+                         'seq_id': speaker_id[i],
+                         'speech': sent_toks,
+                         'paragraph': True})
         return(bits)
 
     def simplify(self, seq_map):

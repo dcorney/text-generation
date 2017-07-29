@@ -27,5 +27,4 @@ def test_make_dialogue():
     dm = dialogue.dialogue_maker(["Alice", "Bob", "Carol", "Dan"], ["she", "he", "she", "he"], mc, seeds)
     dlg = dm.make_dialogue()
     print(dlg)
-    assert isinstance(dlg, str)
-
+    assert isinstance(dlg, list)

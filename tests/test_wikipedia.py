@@ -1,4 +1,4 @@
-from context import wiki as wikipedia
+from context import wikipedia as wikipedia
 
 
 def test_random_bits():

@@ -3,6 +3,7 @@ import random
 
 
 class NameMaker(object):
+    """Return random people's names from given lists"""
     def __init__(self):
         self.male_names = names.words('male.txt')
         self.female_names = names.words('female.txt')
