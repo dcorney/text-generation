@@ -1,0 +1,43 @@
+{
+  "S": [
+    { "weight": 1.0, "prod": [ {"var": "ComplicatingSequence"}, {"var": "ResolvingSequence"} ] }
+  ],
+  "ComplicatingSequence":[
+    {"prod":[{"var":"Helplessness"},{"var":"Complicate"},{"var":"Leaves"}]}
+    ],
+  "Helplessness":[
+    {"prod":[{"var":"Interdiction"},{"var":"Violation"}]}
+    ],
+  "Interdiction":[
+    {"prod":[{"ac":{"subj":"protag3", "act":"warns", "obj":"protag1"}}]},
+    {"prod":[{"ac":{"subj":"protag2", "act":"scares", "obj":"protag1"}}]},
+    {"prod":[{"ac":{"subj":"protag1", "act":"reads", "obj":"warning"}}]}
+  ],
+  "Violation":[
+    {"prod":[{"ac":{"subj":"protag1", "act":"ignores", "obj":"warning"}}]}  
+    ],
+  "Complicate":[
+    {"weight":0.5, "prod":[{"var":"ComplicateVillainy"}]},
+    {"weight":0.5, "prod":[{"var":"ComplicateLack"}]}
+    ],
+  "ComplicateVillainy":[
+    {"prod":[{"ac":{"subj":"antag1", "act":"kidnaps", "obj":"protag2"}}]},
+    {"prod":[{"ac":{"subj":"antag1", "act":"enchants", "obj":"protag2"}}]},
+    {"prod":[{"ac":{"subj":"antag1", "act":"murders", "obj":"protag3"}}]}
+    ],
+  "ComplicateLack":[
+    {"prod":[{"ac":{"subj":"protag1", "act":"loses", "obj":"item1"}}]},
+    {"prod":[{"ac":{"subj":"protag1", "act":"is poor"}}]}
+    ],
+  "Leaves":[
+    {"prod":[{"ac":{"subj":"protag1", "act":"leaves"}}]},
+    {"prod":[{"ac":{"subj":"protag1", "act":"goes to", "obj":"loc2"}},
+                   {"ac":{"subj":"protag1", "act":"goes to", "obj":"loc3"}},
+                   {"ac":{"subj":"protag1", "act":"goes to", "obj":"loc4"}}]}  
+    ],
+  "ResolvingSequence":[
+    {"prod":[{"ac":{"subj":"protag1", "act":"finds", "obj":"item1"}}]},
+    {"prod":[{"ac":{"subj":"protag1", "act":"takes revenge against", "obj":"antag1"}}]}
+  ]
+  
+}
