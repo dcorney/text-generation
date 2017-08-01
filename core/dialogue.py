@@ -137,12 +137,11 @@ class dialogue_maker(object):
 
 
 def dev():
-    mcW = mc.MarkovChain()
-    # print(paragraphs.scored_sentence(["safe"], mcW))
+    import knowledge.names as names
 
-    # phrase = "London dog dog dog safe cat cat travel train train train ship ship ship \
-    # danger death death death murder rescue return return return safe London London London"
-    phrase = "dog cat cat dog dog dog"
-    seeds = phrase.split(" ")
-    dm = dialogue_maker(["Alice", "Bob", "Carol", "Dan"], ["she", "he", "she", "he"], mcW, seeds)
-    print(dm.make_dialogue())
+    mcW = mc.MarkovChain()
+    nm = names.NameMaker()
+    speakers = [nm.random_person() for i in range(1, 4)]
+    dm = dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW, ["dog","run","spot"])
+    dlg = dm.make_dialogue()
+    print(dlg)

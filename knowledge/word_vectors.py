@@ -62,7 +62,7 @@ class WordVectors(Synonymizer):
                     maxToAdd -= 1
                     if maxToAdd <= 0:
                         break
-        return(seq)
+        return(seq[0:n])
 
 
 def dev():

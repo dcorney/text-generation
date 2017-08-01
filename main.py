@@ -1,6 +1,7 @@
 import core.markovchain as mc
 import core.sentence as sentence
 import nlp.tokenizer_stanford as tokenize
+import nlp.pos as pos
 #from gutenberg import basic_strip as bs
 import database.text_importer as gut
 import database.files as store
@@ -8,6 +9,7 @@ import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import knowledge.word_vectors as w2v
 import knowledge.names as names
+import nlp.story_grammar as story_grammar
 import time
 import cProfile
 import pstats
@@ -43,21 +45,21 @@ logger.info("\n========================================== New run ==============
 
 def dev():
     mcW = mc.MarkovChain()
-#     phrase = "dog cat cat dog dog dog"
-#     seeds = phrase.split(" ")
-    seeds = w2v.make_sequence("swim", 20)
-    print(seeds)
-    nm = names.NameMaker()
-    speakers = [nm.random_person() for i in range(1, 4)]
-    dm = dialogue.dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW, seeds)
-    dlg = dm.make_dialogue()
-    # sm = sentence.SentenceMaker(mcW)
-    for s in dlg:
-        print("  " + sentence.SentenceMaker.to_string(s))
+    generator = sentence.SentenceMaker(mcW)
+    # s = generator.generate_sentence_tokens(["man","went"],target_length=10)
+    # s = generator.polish_sentence(s)
+    # print(generator.to_string(s))
 
-    # print(wiki.wiki_random()[0:70])
-    # importer = gut.TextImporter(mcW)
-    # importer.get_text_from_gut(105)
+    story_grammar.make_story(generator)
+    # verbs = pos.verbs(s)
+    # nouns = pos.nouns(s)
+    # print(verbs)
+    # print(nouns)
+    # new_verb = "levitated"
+    # new_noun = "hat"
+    # new_s = [token if token != verbs[0] else new_verb for token in s]
+    # new_s = [token if token != nouns[0] else new_noun for token in new_s]
+    # print(generator.to_string(new_s))
 
 
 if __name__ == "__main__":
