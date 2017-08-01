@@ -67,7 +67,7 @@ class WordNet(Synonymizer):
                         break
             if added_something is False:
                 seq.append(root)
-        return(seq)
+        return(seq[0:n])
 
 
 def dev():
