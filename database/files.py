@@ -1,5 +1,6 @@
 import os
 import boto3
+from botocore.exceptions import ClientError
 from enum import Enum
 import tempfile
 import json
@@ -44,22 +45,51 @@ class files(object):
     def write_s3(self, obj, filename):
         # dir_name = os.path.dirname(file_path)
         # os.makedirs(dir_name, exist_ok=True)
-        tempfile = os.path.dirname(os.path.realpath(__file__)) + "/resources/temp.json"
-        with open(tempfile, 'w') as fp:
-            json.dump(obj, fp)
+        #tempfile = os.path.dirname(os.path.realpath(__file__)) + "/resources/temp.json"
+        (fd, pathname) = tempfile.mkstemp()
+        try:
+            tfile = os.fdopen(fd, "w")
+            json.dump(obj, tfile)
+            tfile.close()
 
-        #s3_path =  "/".join('s3:/','parsed-texts','gut',filename)  #os.environ['S3_BUCKET']
+            # with open(tempfile, 'w') as fp:
+            #     json.dump(obj, fp)
+
+            #s3_path =  "/".join('s3:/','parsed-texts','gut',filename)  #os.environ['S3_BUCKET']
+            client = boto3.client('s3')
+            bucket = 'parsed-texts'
+            #s3_path = 's3://{}/{}'.format(bucket, s3_file_path)
+            try:
+                print("Uploading to S3: {} / {} via {} ...".format(bucket, filename, tfile) )
+                client.upload_file(pathname, bucket, "gut/" + filename)                
+            except:
+                print("Error writing to S3")
+                raise
+        finally:
+            os.remove(pathname)
+        return 0
+
+    def read_s3(self, s3_filename):
         client = boto3.client('s3')
         bucket = 'parsed-texts'
-        #s3_path = 's3://{}/{}'.format(bucket, s3_file_path)
+        (fd, pathname) = tempfile.mkstemp()
         try:
-            print("Uploading to S3: {} / {} ...".format(bucket, filename) )
-            client.upload_file(tempfile, bucket, "gut/" + filename)
-            
-        except:
-            print("Error writing to S3")
-            raise
-        return 0
+            tfile = os.fdopen(fd, "wt")
+            client.download_file(bucket, "gut/" + s3_filename, pathname)
+            with open(pathname) as json_data:
+                obj = json.load(json_data)
+            tfile.close()
+
+        except ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                print("The object {} / {} does not exist.".format(bucket, s3_filename))
+                obj=None
+            else:
+                raise
+        finally:
+            os.remove(pathname)
+        return obj
+    
 
     def write_local_dev(self, text, filename):
         file_dir = os.path.dirname(os.path.realpath(__file__)) + "/resources/texts"

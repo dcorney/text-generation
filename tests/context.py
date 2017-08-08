@@ -10,3 +10,5 @@ import core.sentence as sentence
 import knowledge.wikipedia as wikipedia
 import knowledge.wordnet as wordnet
 import knowledge.word_vectors as word_vectors
+import nlp.pos as pos
+import database.files as files
