@@ -15,14 +15,14 @@ import knowledge.word_vectors as w2v
 import knowledge.names as names
 
 
-LOGDIR="logs"
+LOGDIR = "logs"
 if not os.path.exists(LOGDIR):
     os.mkdir(LOGDIR)
-    
+
 logger = logging.getLogger(__name__)
 
 
-FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
+FORMAT = '%(asctime)s %(name)12s %(funcName)12s() %(levelname)7s: %(message)s'
 logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
 logger.info("\n========================================== New run ==========================================")
 
@@ -69,7 +69,7 @@ def dev():
 
 
 if __name__ == "__main__":
-    ti.dev()
+    dev()
     # cProfile.run('ner.dev()','main_stats')
     # p=pstats.Stats('main_stats')
 
