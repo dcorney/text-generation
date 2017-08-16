@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 # TODO : Write the read functions!
 
+
 class Storage_type(Enum):
     local_temp = 1  # e.g. /tmp
     s3 = 2          # AWS S3 bucket
@@ -18,6 +19,7 @@ class Storage_type(Enum):
 
 class files(object):
     """Reads/writes text files to local directory or to S3 buckets"""
+
     def __init__(self, storage_type=Storage_type.local_temp):
         self._storage_type = storage_type
 
@@ -41,7 +43,6 @@ class files(object):
     #     fp.seek(0)  # Reset file-pointer to start of file, ready for reading back in
     #     return fp
 
-
     def write_s3(self, obj, filename):
         # dir_name = os.path.dirname(file_path)
         # os.makedirs(dir_name, exist_ok=True)
@@ -55,13 +56,13 @@ class files(object):
             # with open(tempfile, 'w') as fp:
             #     json.dump(obj, fp)
 
-            #s3_path =  "/".join('s3:/','parsed-texts','gut',filename)  #os.environ['S3_BUCKET']
+            # s3_path =  "/".join('s3:/','parsed-texts','gut',filename)  #os.environ['S3_BUCKET']
             client = boto3.client('s3')
             bucket = 'parsed-texts'
-            #s3_path = 's3://{}/{}'.format(bucket, s3_file_path)
+            # s3_path = 's3://{}/{}'.format(bucket, s3_file_path)
             try:
-                print("Uploading to S3: {} / {} via {} ...".format(bucket, filename, tfile) )
-                client.upload_file(pathname, bucket, "gut/" + filename)                
+                print("Uploading to S3: {} / {} via {} ...".format(bucket, filename, pathname))
+                client.upload_file(pathname, bucket, "gut/" + filename)
             except:
                 print("Error writing to S3")
                 raise
@@ -83,13 +84,12 @@ class files(object):
         except ClientError as e:
             if e.response['Error']['Code'] == "404":
                 print("The object {} / {} does not exist.".format(bucket, s3_filename))
-                obj=None
+                obj = None
             else:
                 raise
         finally:
             os.remove(pathname)
         return obj
-    
 
     def write_local_dev(self, text, filename):
         file_dir = os.path.dirname(os.path.realpath(__file__)) + "/resources/texts"
@@ -104,7 +104,3 @@ def dev():
     F = files(Storage_type.local_temp)
     file = F.write_text("this is a short bit of text", "dc_temp_file.txt")
     print(file.read())
-
-
-if __name__ == '__main__':
-    test()
