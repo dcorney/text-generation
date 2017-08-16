@@ -1,22 +1,29 @@
+import os
+import time
+import cProfile
+import pstats
+import logging
+
 import core.markovchain as mc
 import core.sentence as sentence
-import nlp.tokenizer_stanford as tokenize
 #from gutenberg import basic_strip as bs
-import database.text_importer as gut
+import database.text_importer as ti
 import database.files as store
 import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import knowledge.word_vectors as w2v
 import knowledge.names as names
-import time
-import cProfile
-import pstats
-import logging
+
+
+LOGDIR="logs"
+if not os.path.exists(LOGDIR):
+    os.mkdir(LOGDIR)
+    
 logger = logging.getLogger(__name__)
 
 
 FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
-logging.basicConfig(filename='logs/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
 logger.info("\n========================================== New run ==========================================")
 
 
@@ -45,7 +52,8 @@ def dev():
     mcW = mc.MarkovChain()
 #     phrase = "dog cat cat dog dog dog"
 #     seeds = phrase.split(" ")
-    seeds = w2v.make_sequence("swim", 20)
+    w2vec = w2v.WordVectors()
+    seeds = w2vec.path("swim", 20)
     print(seeds)
     nm = names.NameMaker()
     speakers = [nm.random_person() for i in range(1, 4)]
@@ -61,8 +69,8 @@ def dev():
 
 
 if __name__ == "__main__":
-    dev()
-    # cProfile.run('dev()','main_stats')
+    ti.dev()
+    # cProfile.run('ner.dev()','main_stats')
     # p=pstats.Stats('main_stats')
 
-    # p.sort_stats('cumulative').print_stats(50)
+    # p.sort_stats('cumulative').print_stats(30)
