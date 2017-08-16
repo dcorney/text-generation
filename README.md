@@ -19,3 +19,7 @@ Most components require a local Redis server to be running, as it stores the Mar
 Most modules have a "dev()" function for locally-testing the module. These are liable to change / be removed, so shouldn't be relied on.
 
 Comments and suggestions always welcome!
+
+David Corney 
+
+dpacorney@gmail.com
