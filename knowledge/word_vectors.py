@@ -2,6 +2,7 @@ from gensim.models import Word2Vec
 import random
 from knowledge.synonymizer import Synonymizer
 from itertools import chain
+import utils
 
 
 class WordVectors(Synonymizer):
@@ -9,6 +10,7 @@ class WordVectors(Synonymizer):
 
     # TODO: a) retrain this on novels; b) move to S3 & download iff missing
     def __init__(self):
+        utils.s3_download(utils.S3_RESOURCE_BUCKET, 'signal_w2v.model', 'resources/signal_w2v.model', aws_profile='default')
         self.model_signal = Word2Vec.load('resources/signal_w2v.model')
 
     def sim(self, word):

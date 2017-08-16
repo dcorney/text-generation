@@ -2,18 +2,16 @@ import os
 import boto3
 import botocore
 import logging
-import time
-import pickle as pkl
-import gzip
-import json
 
 ner_per = "PERSON"
 ner_org = "ORGANIZATION"
 ner_loc = "LOCATION"
 START_TOKEN = "<START_TOKEN>"
 END_TOKEN = "<END_TOKEN>"
+S3_RESOURCE_BUCKET = "dcorney.com.textgen.resources"
 
 logger = logging.getLogger(__name__)
+
 
 def s3_download(s3_bucket, s3_file_path, local_file_path, aws_profile='default'):
     '''

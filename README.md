@@ -14,6 +14,8 @@ Basic structure:
 
 Entry point is main.py which sets up logging and then calls whichever part of the system I'm working on.
 
+Most components require a local Redis server to be running, as it stores the Markov chain. Install by `brew install redis` (for example). Then run the `start-redis.sh` script.
+
 Most modules have a "dev()" function for locally-testing the module. These are liable to change / be removed, so shouldn't be relied on.
 
 Comments and suggestions always welcome!
