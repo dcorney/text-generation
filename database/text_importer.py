@@ -16,16 +16,18 @@ logger = logging.getLogger(__name__)
 def doc_to_text(doc):
     return(str(doc.get('title',"") + "\n" + doc.get('text',"")))
 
+# TODO Maybe remove reference to MarkovChain from this module?
 class TextImporter(object):
     """Download and import text from Project Gutenberg etc."""
 
-    def __init__(self, markovChain):
+    def __init__(self, markovChain=None):
         # self._mc = markovChain
         self._cache = store.files(store.Storage_type.local_dev)
         self._cloud = store.files(store.Storage_type.s3)
         self._store = database.redis_store.redis_store()
         self._doc = {}
 
+    # TODO: treat local store as a cache and only download files not already there
     def doc_from_gut(self, fileid):
         #filename = str(fileid) + ".txt"
         doc = bs.get_clean_text(fileid)
@@ -54,12 +56,13 @@ class TextImporter(object):
     def doc_to_sentences(self):
         return(sents.find_sentences(doc_to_text(self._doc)))
 
-    def doc_to_tokens(self):
-        return(ner(doc_to_text(self._doc)))
-
+    def sents_to_tokens(self, sentences):
+        tokens=[ner.ner(s) for s in sentences]
+        return tokens
+        
         
     def tokens_to_s3(self, tokens, fileid):
-        filename = "gut" + str(fileid)
+        filename = "tokens_" + str(fileid)
         s3 = store.files(store.Storage_type.s3)
         s3.write_text(tokens, filename)
 
@@ -71,20 +74,17 @@ class TextImporter(object):
     #     self.append_title("Gutenburg " + str(fileid) + " " + title + "|" + str(len(tokens['tokens'])) + "|" + str(len(tokens['entities'])))
     #     logger.info("Imported {} tokens into markovchain".format(len(tokens['tokens'])))
 
-    # TODO: treat local store as a cache and only download files not already there
-    def get_text_from_gut(self, fileid):
-        
-        # generator = sentence.SentenceMaker(mc)
-        # s = generator.generate_sentence_tokens(["the", "man"])
-        # print(" ".join(s))
-        pass
+   
+
 
     def append_title(self, title):
         self._store.add_source(title)
 
 def dev():
     ti = TextImporter()
-    ti.doc_from_gut(105)
-    ti.doc_to_cache()
+    ti.doc_from_gut(107)
+    #ti.doc_to_cache()
     ti.doc_to_s3()
-    ti.tokens_to_s3(tokens, 105)
+    sents=ti.doc_to_sentences()
+    tokens=ti.sents_to_tokens(sents)
+    ti.tokens_to_s3(tokens,107)
