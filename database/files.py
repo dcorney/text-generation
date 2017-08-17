@@ -25,7 +25,7 @@ class files(object):
 
     def write_text(self, text, filename=None):
         switcher = {Storage_type.local_temp: files.write_local_temp,
-                    Storage_type.s3: files.write_s3,
+                    Storage_type.s3: files.write_text_s3,
                     Storage_type.local_dev: files.write_local_dev}
 
         func = switcher.get(self._storage_type)
@@ -43,10 +43,12 @@ class files(object):
     #     fp.seek(0)  # Reset file-pointer to start of file, ready for reading back in
     #     return fp
 
-    def write_s3(self, obj, filename):
-        # dir_name = os.path.dirname(file_path)
-        # os.makedirs(dir_name, exist_ok=True)
-        #tempfile = os.path.dirname(os.path.realpath(__file__)) + "/resources/temp.json"
+    def write_text_s3(self, obj, filename):
+        """Writes a text file to the parsed-texts S3 bucket"""
+        self.write_s3(self, obj, "parsed-texts", filename)
+
+    def write_s3(self, obj, bucket, s3_filename):
+        """Write object to local temporary file, then upload to given bucket/filename """
         (fd, pathname) = tempfile.mkstemp()
         try:
             tfile = os.fdopen(fd, "w")
@@ -58,13 +60,13 @@ class files(object):
 
             # s3_path =  "/".join('s3:/','parsed-texts','gut',filename)  #os.environ['S3_BUCKET']
             client = boto3.client('s3')
-            bucket = 'parsed-texts'
+            #bucket = 'parsed-texts'
             # s3_path = 's3://{}/{}'.format(bucket, s3_file_path)
             try:
-                print("Uploading to S3: {} / {} via {} ...".format(bucket, filename, pathname))
-                client.upload_file(pathname, bucket, "gut/" + filename)
+                logger.info("Uploading to S3: {} / {} via {} ...".format(bucket, s3_filename, pathname))
+                client.upload_file(pathname, bucket, "gut/" + s3_filename)
             except:
-                print("Error writing to S3")
+                logger.error("Error uploading to S3: {} / {} via {} ...".format(bucket, s3_filename, pathname))
                 raise
         finally:
             os.remove(pathname)
