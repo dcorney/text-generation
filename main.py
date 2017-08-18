@@ -28,8 +28,8 @@ logger.info("\n========================================== New run ==============
 
 
 def load_text():
-    mcW = mc.MarkovChain()
-#     mcW.delete_all_in_redis_careful()
+    # mcW = mc.MarkovChain()
+    # mcW.delete_all_in_redis_careful()
 
     doc = bs.get_clean_text(107)
     cache = store.files(store.Storage_type.local_dev)
@@ -40,8 +40,8 @@ def load_text():
     tokens = tokenize.tokenize(text[2000:3000])
     print(tokens['tokens'][0:50])
     print(tokens['entities'])
-#     mc.train_words(tokens['tokens'])
-#     mc.append_ner(tokens['entities'])
+#     mcW.train_words(tokens['tokens'])
+#     mcW.append_ner(tokens['entities'])
 
     generator = sentence.SentenceMaker(mc)
     s = generator.generate_sentence_tokens(["the", "man"])
@@ -50,16 +50,20 @@ def load_text():
 
 def dev():
     mcW = mc.MarkovChain()
-#     phrase = "dog cat cat dog dog dog"
-#     seeds = phrase.split(" ")
     w2vec = w2v.WordVectors()
     seeds = w2vec.path("swim", 20)
     print(seeds)
+    generator = sentence.SentenceMaker(mcW)
+    for sd in seeds:
+        sen = generator.generate_sentence_tokens([sd])
+        sen = generator.polish_sentence(sen)
+        print("  " + sentence.SentenceMaker.to_string(sen))
+    print('')
+
     nm = names.NameMaker()
     speakers = [nm.random_person() for i in range(1, 4)]
     dm = dialogue.dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW, seeds)
     dlg = dm.make_dialogue()
-    # sm = sentence.SentenceMaker(mcW)
     for s in dlg:
         print("  " + sentence.SentenceMaker.to_string(s))
 
@@ -70,7 +74,3 @@ def dev():
 
 if __name__ == "__main__":
     dev()
-    # cProfile.run('ner.dev()','main_stats')
-    # p=pstats.Stats('main_stats')
-
-    # p.sort_stats('cumulative').print_stats(30)
