@@ -45,7 +45,7 @@ class files(object):
 
     def write_text_s3(self, obj, filename):
         """Writes a text file to the parsed-texts S3 bucket"""
-        self.write_s3(self, obj, "parsed-texts", filename)
+        self.write_s3(obj, "dcorney.com.text", filename)
 
     def write_s3(self, obj, bucket, s3_filename):
         """Write object to local temporary file, then upload to given bucket/filename """

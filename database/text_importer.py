@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 def doc_to_text(doc):
     return(str(doc.get('title', "") + "\n" + doc.get('text', "")))
 
-# TODO Maybe remove reference to MarkovChain from this module?
 
 
 class TextImporter(object):
@@ -58,13 +57,14 @@ class TextImporter(object):
         return(sents.find_sentences(doc_to_text(self._doc)))
 
     def sents_to_tokens(self, sentences):
-        tokens = [ner.ner(s) for s in sentences]
-        return tokens
+        tokens_entities = [ner.ner(s) for s in sentences]
+        return tokens_entities
 
     def tokens_to_s3(self, sent_tokens, ner_tokens, fileid):
-        token_bucket = "tokens"
+        token_bucket = "dcorney.com.tokens"
         # filename = "tokens_" + str(fileid)
-        s3 = store.files(store.Storage_type.s3)
+        # s3 = store.files(store.Storage_type.s3
+        s3 = store.files()
         s3.write_s3(sent_tokens, token_bucket, "sents_" + str(fileid))
         s3.write_s3(ner_tokens, token_bucket, "ner_" + str(fileid))
 
@@ -74,9 +74,9 @@ class TextImporter(object):
 
 def dev():
     ti = TextImporter()
-    ti.doc_from_gut(107)
-    # ti.doc_to_cache()
+    ti.doc_from_gut(120)
+    ti.doc_to_cache()
     ti.doc_to_s3()
     sents = ti.doc_to_sentences()
     tokens_ner = ti.sents_to_tokens(sents)
-    ti.tokens_to_s3(sents, tokens_ner, 107)
+    ti.tokens_to_s3(sents, tokens_ner, 120)

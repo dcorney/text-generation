@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def find_sentences(text):
     """Returns list of sentences.
     Uses Stanford tokenizer then 'fixes' some false-positive splits"""
-    ss = sent_tokenize(text)
+    ss = sent_tokenize(text.replace('\n', ' '))
     for idx in range(1, len(ss)):
         try:
             if ss[idx - 1][-1] == '"' and ss[idx][0].islower():
