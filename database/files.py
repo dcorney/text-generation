@@ -72,9 +72,12 @@ class files(object):
             os.remove(pathname)
         return 0
 
-    def read_s3(self, s3_filename):
+    def read_text_s3(self, s3_filename):
+        return(self.read_s3("dcorney.com.text", s3_filename))
+
+    def read_s3(self, bucket, s3_filename):
         client = boto3.client('s3')
-        bucket = 'parsed-texts'
+        # bucket = 'parsed-texts'
         (fd, pathname) = tempfile.mkstemp()
         try:
             tfile = os.fdopen(fd, "wt")

@@ -9,7 +9,9 @@ test_obj={"title":"This is the title",
 
 def test_s3_write():
     cloud = files.files(files.Storage_type.s3)
-    cloud.write_s3(test_obj, "test_obj.json")
-    froms3_obj = cloud.read_s3("test_obj.json")
+    cloud.write_text_s3(test_obj, "test_obj.json")
+    froms3_obj = cloud.read_text_s3("test_obj.json")
+    print(froms3_obj)
+    print(test_obj)
     assert froms3_obj == test_obj
 
