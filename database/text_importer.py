@@ -1,7 +1,6 @@
 import logging
 from gutenberg import basic_strip as bs
 import database.redis_store
-# import nlp.tokenizer_stanford as tokenize
 import nlp.ner_spacy as ner
 import nlp.sentences_stanford as sents
 import database.files as store
@@ -18,7 +17,6 @@ def doc_to_text(doc):
     return(str(doc.get('title', "") + "\n" + doc.get('text', "")))
 
 
-
 class TextImporter(object):
     """Download and import text from Project Gutenberg etc."""
 
@@ -30,12 +28,14 @@ class TextImporter(object):
         self._doc = {}
 
     # TODO: treat local store as a cache and only download files not already there
-    def doc_from_gut(self, fileid):
+    def doc_from_gut(self, fileid, max_len=None):
         doc = bs.get_clean_text(fileid)
         title = doc['title']
         text = doc['text']
+        if max_len:
+            text=text[0:max_len]
         logger.info("Downloaded item {}: '{}' from Gutenberg:  ".format(fileid, title))
-        logger.info("Text starts: {}...".format(text[0:500]))
+        #logger.info("Text starts: {}...".format(text[0:500]))
         self._doc = {"title": title, "text": text, "id": fileid}
 
     def doc_to_s3(self):
@@ -49,8 +49,8 @@ class TextImporter(object):
 
     # def tokenize(text)
     #     tokens = tokenize.tokenize(text)
-    #     logger.info("First few tokens from {}: '{}':  ".format(fileid, ",".join(tokens['tokens'][0:50])))
-    #     logger.info("First few entities from {}: '{}':  ".format(fileid, ",".join(tokens['entities'])))
+    #     #logger.info("First few tokens from {}: '{}':  ".format(fileid, ",".join(tokens['tokens'][0:50])))
+    #     #logger.info("First few entities from {}: '{}':  ".format(fileid, ",".join(tokens['entities'])))
     #     return tokens
 
     def doc_to_sentences(self):
@@ -62,11 +62,9 @@ class TextImporter(object):
 
     def tokens_to_s3(self, sent_tokens, ner_tokens, fileid):
         token_bucket = "dcorney.com.tokens"
-        # filename = "tokens_" + str(fileid)
-        # s3 = store.files(store.Storage_type.s3
-        s3 = store.files()
-        s3.write_s3(sent_tokens, token_bucket, "sents_" + str(fileid))
-        s3.write_s3(ner_tokens, token_bucket, "ner_" + str(fileid))
+        r1 = self._cloud.write_s3(sent_tokens, token_bucket, "sents_{}".format(fileid))
+        r2 = self._cloud.write_s3(ner_tokens, token_bucket, "ner_{}".format(fileid))
+        return((r1, r2))
 
     def append_title(self, title):
         self._store.add_source(title)
