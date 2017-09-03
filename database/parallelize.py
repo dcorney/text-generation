@@ -6,31 +6,6 @@ import database.text_importer as textim
 logger = logging.getLogger(__name__)
 
 
-# def load_text(file_id):
-#     with open("/Users/dcorney/temp/{}.txt".format(file_id)) as file_in:
-#         text = file_in.read()
-#         text = text[0:50000]
-#     TI = textim.TextImporter()
-#     TI._doc = {"title": "A title", "text": text, "id": file_id}
-#     # TI.doc_from_gut(id, max_len=500)
-#     TI.doc_to_cache()
-#     # TI.doc_to_s3()
-#     return TI._doc
-
-
-# def tokenize(file_id):
-#     doc = load_text(file_id)
-#     TI = textim.TextImporter()
-#     TI._doc = {"title": doc['title'], "text": doc['text'], "id": file_id}
-#     sents = TI.doc_to_sentences()
-#     print("Text: {} Sents: {}".format(len(doc['text']), len(sents)))
-#     tokens_ner = TI.sents_to_tokens(sents)
-#     print(len(tokens_ner))
-#     TI.tokens_to_s3(sents, tokens_ner, file_id)
-#     return tokens_ner
-
-
-
 def process_one_gut_file(file_id):
     ti = textim.TextImporter()
     ti.doc_from_gut(file_id)
