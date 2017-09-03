@@ -19,7 +19,7 @@ def ner(text, types=["<PERSON>", "<ORGANIZATION>", "<LOCATION>"]):
     entities = [{normalize_types.get(e.label_, e.label_): e.text} for e in doc.ents if normalize_types.get(e.label_, e.label_) in types]
     tokens = [normalize_types.get(t.ent_type_, t.text) for t in doc]
     tokens_filtered = [token for idx, token in enumerate(tokens)
-                       if idx == 0 or (token != tokens[idx - 1] and token[0] == "<")]
+                       if idx == 0 or token != tokens[idx - 1] or token[0] != "<"]
     return {"tokens": tokens_filtered, "entities": entities}
 
 
