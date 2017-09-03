@@ -6,6 +6,10 @@ import logging
 
 import core.markovchain as mc
 import core.sentence as sentence
+
+import nlp.tokenizer_stanford as tokenize
+import nlp.pos as pos
+import database.text_importer as gut
 from gutenberg import basic_strip as bs
 import database.text_importer as ti
 import database.files as store
@@ -13,7 +17,13 @@ import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import knowledge.word_vectors as w2v
 import knowledge.names as names
-import nlp.tokenizer_stanford as tokenize
+
+import nlp.story_grammar as story_grammar
+import time
+import cProfile
+import pstats
+import logging
+
 
 LOGDIR = "logs"
 if not os.path.exists(LOGDIR):
@@ -67,9 +77,17 @@ def dev():
     for s in dlg:
         print("  " + sentence.SentenceMaker.to_string(s))
 
-    # print(wiki.wiki_random()[0:70])
-    # importer = gut.TextImporter(mcW)
-    # importer.get_text_from_gut(105)
+
+    story_grammar.make_story(generator)
+    # verbs = pos.verbs(s)
+    # nouns = pos.nouns(s)
+    # print(verbs)
+    # print(nouns)
+    # new_verb = "levitated"
+    # new_noun = "hat"
+    # new_s = [token if token != verbs[0] else new_verb for token in s]
+    # new_s = [token if token != nouns[0] else new_noun for token in new_s]
+    # print(generator.to_string(new_s))
 
 
 if __name__ == "__main__":

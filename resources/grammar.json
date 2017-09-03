@@ -1,0 +1,112 @@
+{
+  "S": [
+    { "weight": 1.0, "production": [ {"var": "CS"}, {"var": "RS"} ] }
+  ],
+  "RS":[
+    {"production":[{"var":"DS"},{"var":"EP"},{"var":"R"},{"var":"K"},{"var":"Rew"}]}
+    ],
+    "EP":[
+        {"production":{"var":"nothing"}}
+    ],
+
+  "CS":[
+    {"production":[{"var":"HS"},{"var":"C"},{"var":"L"}]}
+    ],
+  "R":[
+    {"weight":0.5, "production":[{"var":"H"},{"var":"I"}]},
+    {"weight":0.5, "production":[{"var":"M"},{"var":"N"}]}
+   ],
+  "HS":[
+    {"production":[{"var":"Int"},{"var":"Vio"}]}
+    ],
+  "Int":[
+    {"production":["told"]},
+    {"production":["asked"]}
+  ],
+
+  "DS":[{"production":[{"var":"D"},{"var":"E"},{"var":"F"},{"var":"G"}]}
+    ],
+  "Vio":[
+    {"weight":0.5, "production":[{"var":"WVio"}]},
+    {"weight":0.5, "production":[{"var":"DEC"},{"var":"SUB"}]}
+   ],
+    "WVio":[
+    {"production":["declined"]},
+    {"production":["disagreed"]}
+    ],
+  "C":[
+    {"weight":0.5, "production":[{"var":"Cv"}]},
+    {"weight":0.5, "production":[{"var":"Cl"}]}
+    ],
+  "Cv":[
+    {"production":["kidnap"]},
+    {"production":["placed under a spell"]},
+    {"production":["robbed"]},
+    {"production":["attacked"]},
+    {"production":["threw a brick at"]},
+    {"production":["murder"]}
+    ],
+  "Cl":[
+    {"production":["poor"]},
+    {"production":["misplaced"]},
+    {"production":["lost"]}
+    ],
+  "DEC":[
+    {"production":["lied"]},
+    {"production":["disguised"]},
+    {"production":["mislead"]}
+    ],
+  "SUB":[
+    {"production":["surrended"]},
+    {"production":["sat down"]},
+    {"production":["gave up"]}
+    ],
+    "D":[
+    {"production":["met an old man"]},
+    {"production":["met an old woman"]}
+    ],
+  "E":[
+    {"production":["guessed right"]},
+    {"production":["knew the answer"]},
+    {"production":["worked it out"]}
+    ],
+  "F":[
+    {"production":["gave a horse"]},
+    {"production":["gave a car"]}
+    ],
+  "G":[
+    {"production":["took him to the kingdom"]},
+    {"production":["drove to the end"]}
+    ],
+
+  "H":[
+    {"production":["surrended"]},
+    {"production":["sat down"]},
+    {"production":["gave up"]}
+    ],
+  "I":[
+    {"production":["surrended"]},
+    {"production":["sat down"]},
+    {"production":["gave up"]}
+    ],
+  "L":[
+    {"production":["surrended"]},
+    {"production":["sat down"]},
+    {"production":["gave up"]}
+    ],
+  "M":[
+    {"production":["surrended"]},
+    {"production":["sat down"]},
+    {"production":["gave up"]}
+    ], 
+    "K":[
+    {"production":["something"]}
+    ] , 
+    "N":[
+    {"production":["something"]}
+    ], 
+    "Rew":[
+    {"production":["given a million pounds"]},
+    {"production":["was reunited with his love"]}
+    ]  
+}
