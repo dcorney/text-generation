@@ -38,14 +38,19 @@ def parallel(file_ids):
 
 
 def dev():
-    file_ids = [125,126,128,130,132]
+    exclusions = [101, 104, 106, 114, 115, 118, 124, 127, 129, 131, 180,
+                 200, 226, 227, 229, 230, 228, 231, 232, 247, 248, 258, 266, 277, 278]
 
-    print("Serial")
-    start_time = time.perf_counter()
-    serial(file_ids)
-    elapsed_time = time.perf_counter() - start_time
-    s_elapsed_time=elapsed_time
-    print(s_elapsed_time)
+    # file_ids = [125,126,128,130,132]
+    s = set(range(125,300))
+    file_ids = [x for x in s if x not in exclusions]
+
+    # print("Serial")
+    # start_time = time.perf_counter()
+    # serial(file_ids)
+    # elapsed_time = time.perf_counter() - start_time
+    # s_elapsed_time=elapsed_time
+    # print(s_elapsed_time)
 
     print('\nParallel')
     start_time = time.perf_counter()

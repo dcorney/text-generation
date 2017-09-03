@@ -10,6 +10,7 @@ import core.sentence as sentence
 import nlp.tokenizer_stanford as tokenize
 import nlp.pos as pos
 import database.text_importer as gut
+import database.parallelize as parallelize
 from gutenberg import basic_strip as bs
 import database.text_importer as ti
 import database.files as store
@@ -79,6 +80,7 @@ def dev():
 
 
     story_grammar.make_story(generator)
+
     # verbs = pos.verbs(s)
     # nouns = pos.nouns(s)
     # print(verbs)
@@ -91,4 +93,4 @@ def dev():
 
 
 if __name__ == "__main__":
-    dev()
+    parallelize.dev()
