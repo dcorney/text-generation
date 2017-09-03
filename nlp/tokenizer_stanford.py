@@ -2,6 +2,7 @@ from nltk import word_tokenize, sent_tokenize
 from nltk.tag import StanfordNERTagger
 from utils import START_TOKEN, END_TOKEN
 import logging
+import utils
 logger = logging.getLogger(__name__)
 
 # Use NER to replace PEOPLE, LOCATION, ORGANISATION tags with special tokens
@@ -10,6 +11,8 @@ logger = logging.getLogger(__name__)
 # E.g. {tokens: ["PERSON" "said" to "PERSON" "'" "Hello" "there" "PERSON"] ,
 #       people: ["John" "Mary" "Mary"], locations: [], organisations :[]}
 
+utils.s3_download(utils.S3_RESOURCE_BUCKET, "stanford-ner-2014-06-16/classifiers/english.all.3class.distsim.crf.ser.gz", "resources/stanford-ner-2014-06-16/classifiers/english.all.3class.distsim.crf.ser.gz", aws_profile='default')
+utils.s3_download(utils.S3_RESOURCE_BUCKET, "stanford-ner-2014-06-16/stanford-ner-3.4.jar", "resources/stanford-ner-2014-06-16/stanford-ner-3.4.jar", aws_profile='default')
 st = StanfordNERTagger("resources/stanford-ner-2014-06-16/classifiers/english.all.3class.distsim.crf.ser.gz",
                        "resources/stanford-ner-2014-06-16/stanford-ner-3.4.jar")
 
