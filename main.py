@@ -3,7 +3,7 @@ import time
 import cProfile
 import pstats
 import logging
-
+import watchtower
 import core.markovchain as mc
 import core.sentence as sentence
 
@@ -30,11 +30,23 @@ LOGDIR = "logs"
 if not os.path.exists(LOGDIR):
     os.mkdir(LOGDIR)
 
-logger = logging.getLogger(__name__)
-
-
-FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
+FORMAT = '%(asctime)s %(name)12s %(funcName)12s() %(levelname)7s: %(message)s'
 logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
+logging.getLogger('s3transfer').setLevel(logging.CRITICAL)
+logging.getLogger('botocore').setLevel(logging.CRITICAL)
+
+cloud_logger = watchtower.CloudWatchLogHandler()
+cloud_logger.setLevel(logging.DEBUG)
+logging.getLogger("textgen").info("Cloud logger here!")
+logging.getLogger("textgen").addHandler(cloud_logger)
+
+# parent_logger = logging.getLogger('textgen')
+# parent_logger.addHandler(watchtower.CloudWatchLogHandler())
+
+
+# parent_logger.info("Parent logger here!")
+
+logger = logging.getLogger("textgen." + __name__)
 logger.info("\n========================================== New run ==========================================")
 
 

@@ -6,7 +6,7 @@ import tempfile
 import json
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgen." + __name__)
 
 # TODO : Write the read functions!
 

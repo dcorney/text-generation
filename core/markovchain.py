@@ -4,7 +4,7 @@ from numpy import cumsum, sum, searchsorted
 from numpy.random import rand
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgen." + __name__)
 
 
 class MarkovChain(object):

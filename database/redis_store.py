@@ -3,7 +3,7 @@ import utils
 import random
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgen." + __name__)
 
 "Interface to persistent datastore."
 

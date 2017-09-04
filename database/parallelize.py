@@ -3,7 +3,7 @@ import time
 import concurrent.futures
 import database.text_importer as textim
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgen." + __name__)
 
 
 def process_one_gut_file(file_id):
@@ -12,9 +12,12 @@ def process_one_gut_file(file_id):
     ti.doc_to_cache()
     ti.doc_to_s3()
     sents = ti.doc_to_sentences()
+    logger.info("Found {} sentences".format(len(sents)))
     tokens_ner = ti.sents_to_tokens(sents)
     ti.tokens_to_s3(sents, tokens_ner, file_id)
+    logger.info("Wrote to S3")
     return tokens_ner
+
 
 def serial(file_ids):
     for id in file_ids:
@@ -23,7 +26,8 @@ def serial(file_ids):
 
 
 
-def parallel(file_ids):    
+def parallel(file_ids):
+    logger.info("Submitting job for {} files ".format(len(file_ids)))
     with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
         futures = {executor.submit(process_one_gut_file, file_id): file_id for file_id in file_ids}
         for future in concurrent.futures.as_completed(futures):
@@ -42,7 +46,7 @@ def dev():
                  200, 226, 227, 229, 230, 228, 231, 232, 247, 248, 258, 266, 277, 278]
 
     # file_ids = [125,126,128,130,132]
-    s = set(range(125,300))
+    s = set(range(165,300))
     file_ids = [x for x in s if x not in exclusions]
 
     # print("Serial")
@@ -51,7 +55,7 @@ def dev():
     # elapsed_time = time.perf_counter() - start_time
     # s_elapsed_time=elapsed_time
     # print(s_elapsed_time)
-
+    logger.info("Starting parallel process")
     print('\nParallel')
     start_time = time.perf_counter()
     parallel(file_ids)
@@ -59,4 +63,4 @@ def dev():
     p_elapsed_time = time.perf_counter() - start_time
     print(p_elapsed_time)
 
-    print("\nSerial {:0.3f}   Parallel {:0.3f}   Ratio {:0.3f}".format(s_elapsed_time, p_elapsed_time, p_elapsed_time/s_elapsed_time))
+    # print("\nSerial {:0.3f}   Parallel {:0.3f}   Ratio {:0.3f}".format(s_elapsed_time, p_elapsed_time, p_elapsed_time/s_elapsed_time))

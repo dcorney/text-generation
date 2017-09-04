@@ -6,7 +6,7 @@ import nlp.sentences_stanford as sents
 import database.files as store
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgen." + __name__)
 
 # Probably best to skip these files:
 # exclusions = [101, 104, 106, 114, 115, 118, 124, 127, 129, 131, 180,
