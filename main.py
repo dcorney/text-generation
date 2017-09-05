@@ -9,6 +9,7 @@ import core.sentence as sentence
 
 import nlp.tokenizer_stanford as tokenize
 import nlp.pos as pos
+import nlp.ner_spacy as spacy
 import database.text_importer as gut
 import database.parallelize as parallelize
 from gutenberg import basic_strip as bs
@@ -18,6 +19,7 @@ import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import knowledge.word_vectors as w2v
 import knowledge.names as names
+
 
 import nlp.story_grammar as story_grammar
 import time

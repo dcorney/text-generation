@@ -32,13 +32,14 @@ def parallel(file_ids):
         futures = {executor.submit(process_one_gut_file, file_id): file_id for file_id in file_ids}
         for future in concurrent.futures.as_completed(futures):
             file_id = futures[future]
+            logger.info("Future completed file {}".format(file_id))
             try:
                 data = future.result()
             except Exception as exc:
                 print('%r generated an exception: %s' % (file_id, exc))
                 raise exc
             else:
-                print('%s file is %d long' % (file_id, len(data)))
+                logger.info('%s file is %d long' % (file_id, len(data)))
 
 
 def dev():
@@ -46,7 +47,7 @@ def dev():
                  200, 226, 227, 229, 230, 228, 231, 232, 247, 248, 258, 266, 277, 278]
 
     # file_ids = [125,126,128,130,132]
-    s = set(range(165,300))
+    s = set(range(102,600))
     file_ids = [x for x in s if x not in exclusions]
 
     # print("Serial")
@@ -61,6 +62,6 @@ def dev():
     parallel(file_ids)
 
     p_elapsed_time = time.perf_counter() - start_time
-    print(p_elapsed_time)
+    logger.info("Total elapsed time: {} for {} files ".format(p_elapsed_time,len(file_ids)))
 
     # print("\nSerial {:0.3f}   Parallel {:0.3f}   Ratio {:0.3f}".format(s_elapsed_time, p_elapsed_time, p_elapsed_time/s_elapsed_time))
