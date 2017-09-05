@@ -1,6 +1,7 @@
 from spacy.en import English
 
 nlp = English()
+logger = logging.getLogger("textgen." + __name__)
 
 # TODO:  Move behind a shared NER abstract wrapper(?)
 
@@ -20,6 +21,7 @@ def ner(text, types=["<PERSON>", "<ORGANIZATION>", "<LOCATION>"]):
     tokens = [normalize_types.get(t.ent_type_, t.text) for t in doc]
     tokens_filtered = [token for idx, token in enumerate(tokens)
                        if idx == 0 or token != tokens[idx - 1] or token[0] != "<"]
+    logger.info("Found {} entities, {} tokens and {} merged tokens".format(len(entities),len(tokens),len(tokens_filtered))) 
     return {"tokens": tokens_filtered, "entities": entities}
 
 
