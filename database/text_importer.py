@@ -30,8 +30,8 @@ class TextImporter(object):
     # TODO: treat local store as a cache and only download files not already there
     def doc_from_gut(self, fileid, max_len=None):
         doc = bs.get_clean_text(fileid)
-        title = doc['title']
-        text = doc['text']
+        title = doc.get('title', "")
+        text = doc.get('text', "")
         if max_len:
             text=text[0:max_len]
         logger.info("Downloaded item {}: '{}' from Gutenberg:  ".format(fileid, title))

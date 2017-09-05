@@ -37,8 +37,9 @@ logging.getLogger('botocore').setLevel(logging.CRITICAL)
 
 cloud_logger = watchtower.CloudWatchLogHandler()
 cloud_logger.setLevel(logging.DEBUG)
-logging.getLogger("textgen").info("Cloud logger here!")
 logging.getLogger("textgen").addHandler(cloud_logger)
+logging.getLogger("textgen").info("Cloud logger here!")
+
 
 # parent_logger = logging.getLogger('textgen')
 # parent_logger.addHandler(watchtower.CloudWatchLogHandler())
