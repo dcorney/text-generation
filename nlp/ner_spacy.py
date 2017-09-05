@@ -1,4 +1,5 @@
 from spacy.en import English
+import logging
 
 nlp = English()
 logger = logging.getLogger("textgen." + __name__)
