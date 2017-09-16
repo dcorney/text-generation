@@ -35,7 +35,7 @@ class TextImporter(object):
         title = doc.get('title', "")
         text = doc.get('text', "")
         if max_len:
-            text=text[0:max_len]
+            text = text[0:max_len]
         logger.info("Downloaded item {}: '{}' from Gutenberg".format(fileid, title))
         #logger.info("Text starts: {}...".format(text[0:500]))
         self._doc = {"title": title, "text": text, "id": fileid}
@@ -77,24 +77,23 @@ class TextImporter(object):
         self._store.add_source(title)
 
     def entity_list_to_dict(self, entity_list):
-        entity_dict={utils.ner_per: [], utils.ner_org: [], utils.ner_loc: []}
+        entity_dict = {utils.ner_per: [], utils.ner_org: [], utils.ner_loc: []}
         for d in entity_list:
             k = list(d.keys())[0]
             entity_dict[k[1:-1]].append(d[k])
         return entity_dict
 
-    def s3_to_markov(self, fileid, mcW):        
+    def s3_to_markov(self, fileid, mcW):
         logger.info("Importing file {} from s3".format(fileid))
         sents = self.tokens_from_s3(fileid)
         if sents:
-            logger.info("Found {} sentences".format(len(sents)))
             for s in sents:
                 mcW.add_sentence(" ".join(s['tokens']))
-                # mcW.train_words(s['tokens'])
                 mcW.append_ner(self.entity_list_to_dict(s['entities']))
-            else:
-                logger.info("Can't import from file {}".format(fileid))
-        
+            logger.info("Imported {} sentences".format(len(sents)))
+        else:
+            logger.info("Can't import from file {}".format(fileid))
+
 
 def dev():
     ti = TextImporter()
