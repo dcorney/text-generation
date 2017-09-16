@@ -111,13 +111,14 @@ def dev():
 
 if __name__ == "__main__":
     #Restore latest Redis from S3:
-    f = store(store.Storage_type.s3)
+    f = store.files(store.Storage_type.s3)
+
     f.redis_from_s3()
     mcW = mc.MarkovChain()
 
     #Import more texts:
     ti = ti.TextImporter()
-    for fileid in range(107, 110):
+    for fileid in range(110, 120):
         ti.s3_to_markov(fileid, mcW)
 
     f.redis_to_s3()
