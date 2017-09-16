@@ -10,8 +10,8 @@ logger = logging.getLogger("textgen." + __name__)
 
 class redis_store(object):
 
-    def __init__(self):
-        self._redis = redis.StrictRedis(host='localhost', port=6379, db=0)
+    def __init__(self, host='localhost', port=6379, db=0):
+        self._redis = redis.StrictRedis(host=host, port=port, db=db)
 
     def delete_all_in_redis_be_careful(self):
         self._redis.flushdb()

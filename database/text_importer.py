@@ -4,6 +4,8 @@ import database.redis_store
 import nlp.ner_spacy as ner
 import nlp.sentences_stanford as sents
 import database.files as store
+import utils
+from botocore.exceptions import ClientError
 
 
 logger = logging.getLogger("textgen." + __name__)
@@ -34,7 +36,7 @@ class TextImporter(object):
         text = doc.get('text', "")
         if max_len:
             text=text[0:max_len]
-        logger.info("Downloaded item {}: '{}' from Gutenberg:  ".format(fileid, title))
+        logger.info("Downloaded item {}: '{}' from Gutenberg".format(fileid, title))
         #logger.info("Text starts: {}...".format(text[0:500]))
         self._doc = {"title": title, "text": text, "id": fileid}
 
@@ -54,7 +56,7 @@ class TextImporter(object):
     #     return tokens
 
     def doc_to_sentences(self):
-        return(sents.find_sentences(doc_to_text(self._doc)))
+        return sents.find_sentences(doc_to_text(self._doc))
 
     def sents_to_tokens(self, sentences):
         tokens_entities = [ner.ner(s) for s in sentences]
@@ -66,15 +68,43 @@ class TextImporter(object):
         r2 = self._cloud.write_s3(ner_tokens, token_bucket, "ner_{}".format(fileid))
         return((r1, r2))
 
+    def tokens_from_s3(self, fileid):
+        token_bucket = "dcorney.com.tokens"
+        sents = self._cloud.read_s3(token_bucket, "ner_{}".format(fileid))
+        return sents
+
     def append_title(self, title):
         self._store.add_source(title)
 
+    def entity_list_to_dict(self, entity_list):
+        entity_dict={utils.ner_per: [], utils.ner_org: [], utils.ner_loc: []}
+        for d in entity_list:
+            k = list(d.keys())[0]
+            entity_dict[k[1:-1]].append(d[k])
+        return entity_dict
+
+    def s3_to_markov(self, fileid, mcW):        
+        logger.info("Importing file {} from s3".format(fileid))
+        sents = self.tokens_from_s3(fileid)
+        if sents:
+            logger.info("Found {} sentences".format(len(sents)))
+            for s in sents:
+                mcW.add_sentence(" ".join(s['tokens']))
+                # mcW.train_words(s['tokens'])
+                mcW.append_ner(self.entity_list_to_dict(s['entities']))
+            else:
+                logger.info("Can't import from file {}".format(fileid))
+        
 
 def dev():
     ti = TextImporter()
-    ti.doc_from_gut(120)
-    ti.doc_to_cache()
-    ti.doc_to_s3()
-    sents = ti.doc_to_sentences()
-    tokens_ner = ti.sents_to_tokens(sents)
-    ti.tokens_to_s3(sents, tokens_ner, 120)
+    # ti.doc_from_gut(120)
+    # ti.doc_to_cache()
+    # ti.doc_to_s3()
+    # sents = ti.doc_to_sentences()
+    # tokens_ner = ti.sents_to_tokens(sents)
+    # ti.tokens_to_s3(sents, tokens_ner, 120)
+    # sents = ti.tokens_from_s3(107)
+    # [print("{} {}".format(s['tokens'], s['entities'])) for s in sents[6:10]]
+
+    print(ti.entity_list_to_dict([{'<LOCATION>': 'South Park'}, {'<LOCATION>': 'Gloucester'}, {'<PERSON>': 'Elizabeth'}]))

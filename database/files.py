@@ -1,4 +1,6 @@
 import os
+import gzip
+import shutil
 import boto3
 from botocore.exceptions import ClientError
 from enum import Enum
@@ -100,8 +102,33 @@ class files(object):
         f.write(text.encode("utf-8"))
         f.close()
 
+    def redis_to_s3(self, redis_file="/usr/local/var/db/redis/dump.rdb"):
+        redis_gz = "/usr/local/var/db/redis/dump.rdb.gz" # TODO: zip into tmp directory
+        with open(redis_file, 'rb') as f_in:
+            with gzip.open(redis_gz, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        bucket="dcorney.com.redis-dumps"
+        s3_filename="redis_backup.rdb.gz"
+        logger.info("Uploading redis backup to S3: {} / {} via {} ...".format(bucket, s3_filename, redis_gz))
+        self._client.upload_file(redis_gz, bucket, "{}".format(s3_filename))
+
+
+    def redis_from_s3(self, local_file="/usr/local/var/db/redis/dump.rdb"):
+        # redis_gz = "/usr/local/var/db/redis/dump.rdb.gz" # TODO: zip into tmp directory
+        bucket="dcorney.com.redis-dumps"
+        s3_filename="redis_backup.rdb.gz"
+        local_gz = "/usr/local/var/db/redis/dump.rdb.gz"
+        logger.info("Downloading redis backup from S3: {} / {} to {} ...".format(bucket, s3_filename, local_gz))
+        self._client.download_file(bucket, s3_filename, "{}".format(local_gz))
+        with gzip.open(local_gz, 'rb') as f_in:
+            with open(local_file, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        
 
 def dev():
-    F = files(Storage_type.local_temp)
-    file = F.write_text("this is a short bit of text", "dc_temp_file.txt")
-    print(file.read())
+    # F = files(Storage_type.local_temp)
+    # file = F.write_text("this is a short bit of text", "dc_temp_file.txt")
+    # print(file.read())
+    f=files(Storage_type.s3)
+    # f.redis_to_s3()
+    f.redis_from_s3(local_file="/usr/local/var/db/redis/dump.rdb")
