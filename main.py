@@ -21,12 +21,9 @@ import knowledge.word_vectors as w2v
 import knowledge.names as names
 
 
-import nlp.story_grammar as story_grammar
-import time
-import cProfile
-import pstats
-import logging
 
+import nlp.story_grammar as story_grammar
+import sys
 
 LOGDIR = "logs"
 if not os.path.exists(LOGDIR):
@@ -41,6 +38,11 @@ cloud_logger = watchtower.CloudWatchLogHandler()
 cloud_logger.setLevel(logging.DEBUG)
 logging.getLogger("textgen").addHandler(cloud_logger)
 logging.getLogger("textgen").info("Cloud logger here!")
+
+# ch = logging.StreamHandler(sys.stdout)
+# ch.setLevel(logging.DEBUG)
+# ch.setFormatter(logging.Formatter('%(asctime)s %(funcName)12s() %(message)s'))
+# logging.getLogger('').addHandler(ch)
 
 
 # parent_logger = logging.getLogger('textgen')
@@ -108,4 +110,21 @@ def dev():
 
 
 if __name__ == "__main__":
-    parallelize.dev()
+    #Restore latest Redis from S3:
+    f = store(store.Storage_type.s3)
+    f.redis_from_s3()
+    mcW = mc.MarkovChain()
+
+    #Import more texts:
+    ti = ti.TextImporter()
+    for fileid in range(107, 110):
+        ti.s3_to_markov(fileid, mcW)
+
+    f.redis_to_s3()
+       
+    generator = sentence.SentenceMaker(mcW)
+    sen = generator.generate_sentence_tokens(["dog"])
+    sen = generator.polish_sentence(sen)
+    print("  " + sentence.SentenceMaker.to_string(sen))
+
+
