@@ -1,9 +1,12 @@
 import logging
+import concurrent.futures
+# from botocore.exceptions import ClientError
 from gutenberg import basic_strip as bs
 import database.redis_store
 import nlp.ner_spacy as ner
 import nlp.sentences_stanford as sents
 import database.files as store
+import utils
 
 
 logger = logging.getLogger(__name__)
@@ -70,11 +73,23 @@ class TextImporter(object):
         self._store.add_source(title)
 
 
+    def entity_list_to_dict(self, entity_list):
+        entity_dict = {utils.ner_per: [], utils.ner_org: [], utils.ner_loc: []}
+        for d in entity_list:
+            k = list(d.keys())[0]
+            entity_dict[k[1:-1]].append(d[k])
+        return entity_dict
+
+
+
 def dev():
     ti = TextImporter()
-    ti.doc_from_gut(120)
-    ti.doc_to_cache()
-    ti.doc_to_s3()
-    sents = ti.doc_to_sentences()
-    tokens_ner = ti.sents_to_tokens(sents)
-    ti.tokens_to_s3(sents, tokens_ner, 120)
+    # ti.doc_from_gut(120)
+    # ti.doc_to_cache()
+    # ti.doc_to_s3()
+    # sents = ti.doc_to_sentences()
+    # tokens_ner = ti.sents_to_tokens(sents)
+    # ti.tokens_to_s3(sents, tokens_ner, 120)
+    # sents = ti.tokens_from_s3(107)
+    # [print("{} {}".format(s['tokens'], s['entities'])) for s in sents[6:10]]
+

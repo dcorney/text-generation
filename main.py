@@ -3,13 +3,15 @@ import time
 import cProfile
 import pstats
 import logging
-
+import watchtower
 import core.markovchain as mc
 import core.sentence as sentence
 
 import nlp.tokenizer_stanford as tokenize
 import nlp.pos as pos
+import nlp.ner_spacy as spacy
 import database.text_importer as gut
+import database.parallelize as parallelize
 from gutenberg import basic_strip as bs
 import database.text_importer as ti
 import database.files as store
@@ -17,23 +19,40 @@ import core.dialogue as dialogue
 import knowledge.wikipedia as wiki
 import knowledge.word_vectors as w2v
 import knowledge.names as names
+import database.toy_parallel_redis as pararedis
+import cli
+
 
 import nlp.story_grammar as story_grammar
-import time
-import cProfile
-import pstats
-import logging
-
+import sys
 
 LOGDIR = "logs"
 if not os.path.exists(LOGDIR):
     os.mkdir(LOGDIR)
 
-logger = logging.getLogger(__name__)
-
-
-FORMAT = '%(asctime)s %(name)12ss %(funcName)12s() %(levelname)7s: %(message)s'
+FORMAT = '%(asctime)s %(name)12s %(funcName)12s() %(levelname)7s: %(message)s'
 logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
+logging.getLogger('s3transfer').setLevel(logging.CRITICAL)
+logging.getLogger('botocore').setLevel(logging.CRITICAL)
+
+cloud_logger = watchtower.CloudWatchLogHandler()
+cloud_logger.setLevel(logging.DEBUG)
+logging.getLogger("textgen").addHandler(cloud_logger)
+logging.getLogger("textgen").info("Cloud logger here!")
+
+# ch = logging.StreamHandler(sys.stdout)
+# ch.setLevel(logging.DEBUG)
+# ch.setFormatter(logging.Formatter('%(asctime)s %(funcName)12s() %(message)s'))
+# logging.getLogger('').addHandler(ch)
+
+
+# parent_logger = logging.getLogger('textgen')
+# parent_logger.addHandler(watchtower.CloudWatchLogHandler())
+
+
+# parent_logger.info("Parent logger here!")
+
+logger = logging.getLogger("textgen." + __name__)
 logger.info("\n========================================== New run ==========================================")
 
 
@@ -79,6 +98,7 @@ def dev():
 
 
     story_grammar.make_story(generator)
+
     # verbs = pos.verbs(s)
     # nouns = pos.nouns(s)
     # print(verbs)
@@ -91,4 +111,25 @@ def dev():
 
 
 if __name__ == "__main__":
-    dev()
+    cli.init()
+    
+    # pararedis.dev()
+    #Restore latest Redis from S3:
+    # f = store.files(store.Storage_type.s3)
+
+    # f.redis_from_s3()
+    # mcW = mc.MarkovChain()
+
+    # Import more texts:
+    # ti = ti.TextImporter()
+    # for fileid in range(120, 125):
+    #     ti.s3_to_markov(fileid, mcW)
+    # ti.parallel_markov_import(range(120, 122), mcW)
+    # f.redis_to_s3()
+
+    # generator = sentence.SentenceMaker(mcW)
+    # sen = generator.generate_sentence_tokens(["dog"])
+    # sen = generator.polish_sentence(sen)
+    # print("  " + sentence.SentenceMaker.to_string(sen))
+
+

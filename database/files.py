@@ -8,7 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# TODO : Write the read functions!
+# TODO: only create this if needed. E.g. init to None, then later, create if None
+store_s3 = None
 
 
 class Storage_type(Enum):
@@ -17,18 +18,18 @@ class Storage_type(Enum):
     local_dev = 3   # e.g. working_dir/resources/texts
 
 
-# TODO: only create this if needed. E.g. init to None, then later, create if None
-store_s3 = boto3.client('s3')  # init boto3 client
-
-
+# TODO: change name to Files
 class files(object):
     """Reads/writes text files to local directory or to S3 buckets"""
 
     def __init__(self, storage_type=Storage_type.local_temp):
+        global store_s3
         self._storage_type = storage_type
-        if storage_type==Storage_type.s3:
+        if storage_type == Storage_type.s3:
+            if store_s3 is None:
+                print("Initializing boto3/s3 client")
+                store_s3 = boto3.client('s3')  # init boto3 client
             self._client = store_s3
-            print("Using boto S3 client")
 
     def write_text(self, text, filename=None):
         switcher = {Storage_type.local_temp: files.write_local_temp,
@@ -95,13 +96,37 @@ class files(object):
         file_dir = os.path.dirname(os.path.realpath(__file__)) + "/resources/texts/"
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        print("Writing to " + file_dir )
+        print("Writing to " + file_dir)
         f = open(file_dir + "/" + filename, 'w+b')
         f.write(text.encode("utf-8"))
         f.close()
 
+    def redis_to_s3(self, redis_file="/usr/local/var/db/redis/dump.rdb"):
+        redis_gz = "/usr/local/var/db/redis/dump.rdb.gz"  # TODO: zip into tmp directory
+        with open(redis_file, 'rb') as f_in:
+            with gzip.open(redis_gz, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        bucket = "dcorney.com.redis-dumps"
+        s3_filename = "redis_backup.rdb.gz"
+        logger.info("Uploading redis backup to S3: {} / {} via {} ...".format(bucket, s3_filename, redis_gz))
+        self._client.upload_file(redis_gz, bucket, "{}".format(s3_filename))
+
+    def redis_from_s3(self, local_file="/usr/local/var/db/redis/dump.rdb"):
+        # redis_gz = "/usr/local/var/db/redis/dump.rdb.gz" # TODO: zip into tmp directory
+        bucket = "dcorney.com.redis-dumps"
+        s3_filename = "redis_backup.rdb.gz"
+        local_gz = "/usr/local/var/db/redis/dump.rdb.gz"
+        logger.info("Downloading redis backup from S3: {} / {} to {} ...".format(bucket, s3_filename, local_gz))
+        self._client.download_file(bucket, s3_filename, "{}".format(local_gz))
+        with gzip.open(local_gz, 'rb') as f_in:
+            with open(local_file, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
 
 def dev():
-    F = files(Storage_type.local_temp)
-    file = F.write_text("this is a short bit of text", "dc_temp_file.txt")
-    print(file.read())
+    # F = files(Storage_type.local_temp)
+    # file = F.write_text("this is a short bit of text", "dc_temp_file.txt")
+    # print(file.read())
+    f = files(Storage_type.s3)
+    # f.redis_to_s3()
+    f.redis_from_s3(local_file="/usr/local/var/db/redis/dump.rdb")

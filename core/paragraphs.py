@@ -2,7 +2,7 @@ import core.sentence as sentence
 import nltk
 from nltk.tokenize import RegexpTokenizer
 import knowledge.wikipedia as wikipedia
-import knowledge.thesaurus as thesaurus
+import knowledge.wordnet as thesaurus
 import random
 import logging
 
@@ -39,7 +39,7 @@ def seq_to_para(seq, mc):
 
 
 def sentences_from_thesaurus(seeds, mc, n=10):
-    new_seeds = thesaurus.expand_seeds(seeds, n)
+    new_seeds = thesaurus.synonyms(seeds, n)
     para = seq_to_para(new_seeds, mc)
     return(para)
 
@@ -48,7 +48,7 @@ def dev():
     import core.markovchain as mc
     mcW = mc.MarkovChain()
     sm = sentence.SentenceMaker(mcW)
-    ss=sentences_from_thesaurus(["cat","anger","sorry","cat"],mcW)
+    ss = sentences_from_thesaurus(["cat", "anger", "sorry", "cat"], mcW)
     for s in ss:
         sent = sm.polish_sentence(s)
         print("   " + sm.to_string(sent))

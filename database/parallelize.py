@@ -5,6 +5,9 @@ import database.text_importer as textim
 
 logger = logging.getLogger(__name__)
 
+# Download file from Gutenburg and run through tokenizer / NER, storing results in S3
+# Uses concurrent execution.
+# TODO: rename module & functions to something sensible!
 
 def process_one_gut_file(file_id):
     ti = textim.TextImporter()
