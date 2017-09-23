@@ -34,13 +34,13 @@ class SentenceMaker(object):
                     if len(result) > (target_length * 0.75):
                         terminal_boost += 1
                     new = self._markovChain.predict(result[-mc_order:], 'forward', terminal_boost)
-                    logger.info("Generate fwd from '%s' to '%s':  ", str(result[0:mc_order]), new)
+                    # logger.info("Generate fwd from '%s' to '%s':  ", str(result[0:mc_order]), new)
                     result.append(new)
                 while result[0] != utils.START_TOKEN:
                     if len(result) > (target_length * 0.85):
                         terminal_boost += 1
                     new = self._markovChain.predict(result[0:mc_order], 'reverse', terminal_boost)
-                    logger.info("Generate reverse from '{}' to '{}':  ".format(str(result[0:mc_order]), new))
+                    # logger.info("Generate reverse from '{}' to '{}':  ".format(str(result[0:mc_order]), new))
                     result.insert(0, new)
                 # Evaluate sentence
                 sentence_length = len(result)
