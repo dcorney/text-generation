@@ -31,7 +31,7 @@ if not os.path.exists(LOGDIR):
     os.mkdir(LOGDIR)
 
 FORMAT = '%(asctime)s %(name)12s %(funcName)12s() %(levelname)7s: %(message)s'
-logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.DEBUG, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
+logging.basicConfig(filename=LOGDIR + '/textgen.log', level=logging.INFO, format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S')
 logging.getLogger('s3transfer').setLevel(logging.CRITICAL)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 
@@ -112,7 +112,7 @@ def dev():
 
 if __name__ == "__main__":
     cli.init()
-    
+
     # pararedis.dev()
     #Restore latest Redis from S3:
     # f = store.files(store.Storage_type.s3)
