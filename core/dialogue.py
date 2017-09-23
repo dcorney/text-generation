@@ -21,13 +21,13 @@ logger = logging.getLogger(__name__)
 
 class dialogue_maker(object):
     """Class to handle creating dialogue based on a list of speakers and a sentence generator."""
-    def __init__(self, names, pronouns, mc, seeds):
+    def __init__(self, names, pronouns, mc):
         self.speakers = [{"name": n, "pronoun": p} for n, p in list(zip(names, pronouns))]
         self._transitions = self.make_transition_probs()
         self._speech_acts = ["said", "whispered", "shouted", "cried"]
         self._acts_transitions = [25, 2, 2, 2]
         self.mc = mc
-        self.seeds = seeds
+        # self.seeds = seeds
         self.target_len = np.random.randint(5, 50, size=len(names))  # rough words per sentence
 
     def make_transition_probs(self):
@@ -67,13 +67,14 @@ class dialogue_maker(object):
     def seq_to_names(self, sequence):
         return([self.speakers[id] for id in sequence])
 
-    def make_speech_bits(self, n):
+    def make_speech_bits(self, seeds):
+        n = len(seeds)
         speaker_id = self.speaker_sequence(0, n)
         speech_acts_seq = self.speech_sequence(n)
         bits = []
         ss = sentence.SentenceMaker(self.mc)
         for i in range(n):
-            sent_toks = ss.generate_sentence_tokens([self.seeds[i]], self.target_len[speaker_id[i]])
+            sent_toks = ss.generate_sentence_tokens([seeds[i]], self.target_len[speaker_id[i]])
             sent_toks = ss.polish_sentence(sent_toks)
             bits.append({'speaker_name': self.speakers[speaker_id[i]]["name"],
                          'speech_act': speech_acts_seq[speaker_id[i]],
@@ -127,10 +128,9 @@ class dialogue_maker(object):
             sents.append(tokens)
         return sents
 
-    def make_dialogue(self):
+    def make_dialogue(self, seeds):
         """Returns a list of sentences, each being a list of tokens."""
-        n = len(self.seeds)
-        acts = self.make_speech_bits(n)
+        acts = self.make_speech_bits(seeds)
         seq_map = self.simplify(acts)
         sents = self.report_seq(seq_map)
         return(sents)
@@ -142,6 +142,6 @@ def dev():
     mcW = mc.MarkovChain()
     nm = names.NameMaker()
     speakers = [nm.random_person() for i in range(1, 4)]
-    dm = dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW, ["dog","run","spot"])
-    dlg = dm.make_dialogue()
+    dm = dialogue_maker([n['name'] for n in speakers], [n['pronoun'] for n in speakers], mcW)
+    dlg = dm.make_dialogue(["dog", "run", "spot"])
     print(dlg)
