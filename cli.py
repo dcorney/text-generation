@@ -5,6 +5,7 @@ import core.paragraphs as paras
 import nlp.story_grammar as story_grammar
 import knowledge.names as names
 import core.dialogue as dialogue
+import database.redis_store as redis
 
 mcW = mc.MarkovChain()
 generator = sentence.SentenceMaker(mcW)
@@ -48,6 +49,8 @@ def init():
     parser.add_argument("--story", action='store_true', help="Make & show a story!")
     parser.add_argument("--seed", action='store', type=str, help="Seed word/phrase for generation")
     parser.add_argument("--dialogue", action='store', type=int, help="Dialogue between n people")
+    parser.add_argument("--redisdbdir", action='store', type=str, help="Directory containing Redis/MarkovChain database")
+    parser.add_argument("--redisconf", action='store', type=str, default="conf/redis_new.conf", help="Filename of new Redis config file")
     # TODO: add args:
     
     # pre-process numbered texts from Gutenburg
@@ -56,6 +59,8 @@ def init():
 
 
     args = parser.parse_args()
+    if args.redisdb:
+        redis.set_redis_dir("conf/redis.conf", args.redisconf, args.redisdb)
     if args.make:
         make_sentences(args.make, args.seed)
         exit(0)

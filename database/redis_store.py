@@ -67,3 +67,24 @@ class redis_store(object):
         print(self._redis.lrange(self._ner_per, 0, n))
         print(self._redis.lrange(self._ner_org, 0, n))
         print(self._redis.lrange(self._ner_loc, 0, n))
+
+
+
+def set_redis_dir(orig_file="conf/redis.conf", new_file="conf/new.conf", new_dir="resources"):
+    """Updates Redis config file; so must be called *before* starting Redis"""
+    with open(orig_file, "r") as myfile:
+        data = myfile.readlines()
+
+    dir_lines = 0
+    for r in data:
+        if r.lstrip().startswith('dir'):
+            dir_lines += 1
+    if dir_lines != 1:
+        print("Error! Found more than one line starting with 'dir'")
+    data = ["dir " + new_dir if r.lstrip().startswith('dir') else r for r in data]
+
+    with open(new_file, "w") as myfile:
+        for r in data:
+            myfile.write(r)
+
+# set_db_dir(orig_file="conf/redis.conf", new_file="conf/new.conf", new_dir="resources/really_fake")
